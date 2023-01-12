@@ -1,0 +1,15 @@
+version: "3.9"
+services:
+  service:
+    build:
+      context: ./
+      dockerfile: dockerfile
+    container_name: sendmail_service
+    ports:
+      - 8000:80
+    restart: unless-stopped
+    volumes:
+      - ./:/base
+    env_file:
+      - ./.env
+
