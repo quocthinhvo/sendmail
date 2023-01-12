@@ -4,6 +4,12 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse
 from pydantic import EmailStr, BaseModel
 from typing import List
+import yaml
+
+# read config form yaml
+with open("config.yaml", "r") as yamlfile:
+    configData = yaml.load(yamlfile, Loader=yaml.FullLoader)
+
 app = FastAPI()
 
 class EmailSchema(BaseModel):
@@ -12,15 +18,15 @@ class EmailSchema(BaseModel):
    body: str
 
 conf = ConnectionConfig(
-    MAIL_USERNAME ="",
-    MAIL_PASSWORD = "",
-    MAIL_FROM = "",
-    MAIL_PORT = 587,
-    MAIL_SERVER = "",
-    MAIL_STARTTLS = False,
-    MAIL_SSL_TLS = True,
-    USE_CREDENTIALS = True,
-    VALIDATE_CERTS = True
+    MAIL_USERNAME = configData["MAIL_USERNAME"],
+    MAIL_PASSWORD = configData["MAIL_PASSWORD"],
+    MAIL_FROM = configData["MAIL_FROM"],
+    MAIL_PORT = configData["MAIL_PORT"],
+    MAIL_SERVER = configData["MAIL_SERVER"],
+    MAIL_STARTTLS = configData["MAIL_STARTTLS"],
+    MAIL_SSL_TLS = configData["MAIL_SSL_TLS"],
+    USE_CREDENTIALS = configData["USE_CREDENTIALS"],
+    VALIDATE_CERTS = configData["VALIDATE_CERTS"]
 )
 
 @app.get("/")
