@@ -6,9 +6,6 @@ from pydantic import EmailStr, BaseModel
 from typing import List
 import yaml
 
-# read config form yaml
-with open("config.yaml", "r") as yamlfile:
-    configData = yaml.load(yamlfile, Loader=yaml.FullLoader)
 
 app = FastAPI()
 
@@ -17,17 +14,17 @@ class EmailSchema(BaseModel):
    subject: str
    body: str
 
-conf = ConnectionConfig(
-    MAIL_USERNAME = configData["MAIL_USERNAME"],
-    MAIL_PASSWORD = configData["MAIL_PASSWORD"],
-    MAIL_FROM = configData["MAIL_FROM"],
-    MAIL_PORT = configData["MAIL_PORT"],
-    MAIL_SERVER = configData["MAIL_SERVER"],
-    MAIL_STARTTLS = configData["MAIL_STARTTLS"],
-    MAIL_SSL_TLS = configData["MAIL_SSL_TLS"],
-    USE_CREDENTIALS = configData["USE_CREDENTIALS"],
-    VALIDATE_CERTS = configData["VALIDATE_CERTS"]
-)
+class ConfigUpdateSchema(BaseModel):
+    MODE: str
+    MAIL_USERNAME : str
+    MAIL_PASSWORD : str
+    MAIL_FROM : str
+    MAIL_PORT : int
+    MAIL_SERVER : str
+    MAIL_STARTTLS : bool
+    MAIL_SSL_TLS : bool
+    USE_CREDENTIALS : bool
+    VALIDATE_CERTS : bool
 
 @app.get("/")
 async def root():
@@ -36,6 +33,22 @@ async def root():
 @app.post("/send_mail")
 async def send_mail(email: EmailSchema):
     try:
+        # read config form yaml
+        with open("config.yaml", "r") as yamlfile:
+            configData = yaml.load(yamlfile, Loader=yaml.FullLoader)
+            yamlfile.close()
+        conf = ConnectionConfig(
+            MAIL_USERNAME = configData["MAIL_USERNAME"],
+            MAIL_PASSWORD = configData["MAIL_PASSWORD"],
+            MAIL_FROM = configData["MAIL_FROM"],
+            MAIL_PORT = configData["MAIL_PORT"],
+            MAIL_SERVER = configData["MAIL_SERVER"],
+            MAIL_STARTTLS = configData["MAIL_STARTTLS"],
+            MAIL_SSL_TLS = configData["MAIL_SSL_TLS"],
+            USE_CREDENTIALS = configData["USE_CREDENTIALS"],
+            VALIDATE_CERTS = configData["VALIDATE_CERTS"]
+        )
+
         message = MessageSchema(
             subject=email.dict().get("subject"),
             recipients=email.dict().get("email"), 
@@ -47,3 +60,33 @@ async def send_mail(email: EmailSchema):
         return JSONResponse(status_code=200, content={"status": "Send complete"})
     except:
         return JSONResponse(status_code=500, content={"status": "An exception occurred"})
+
+
+@app.post("/config/update")
+async def config_update(newconfigschema: ConfigUpdateSchema):
+    newconfig = {
+        'MODE': newconfigschema.dict().get("MODE"),
+        'MAIL_USERNAME' : newconfigschema.dict().get("MAIL_USERNAME"),
+        'MAIL_PASSWORD' : newconfigschema.dict().get("MAIL_PASSWORD"),
+        'MAIL_FROM' : newconfigschema.dict().get("MAIL_FROM"),
+        'MAIL_PORT' : newconfigschema.dict().get("MAIL_PORT"),
+        'MAIL_SERVER' : newconfigschema.dict().get("MAIL_SERVER"),
+        'MAIL_STARTTLS' : newconfigschema.dict().get("MAIL_STARTTLS"),
+        'MAIL_SSL_TLS' : newconfigschema.dict().get("MAIL_SSL_TLS"),
+        'USE_CREDENTIALS' : newconfigschema.dict().get("USE_CREDENTIALS"),
+        'VALIDATE_CERTS' : newconfigschema.dict().get("VALIDATE_CERTS")
+    }
+    try: 
+        with open("config.yaml", "w") as yamlfile:
+            yamlWrite = yaml.dump(newconfig, yamlfile)
+            yamlfile.close()
+            return JSONResponse(status_code=200, content={"status": "Config update complete"})
+    except:
+        return JSONResponse(status_code=500, content={"status": "An exception occurred"})
+
+@app.get("/config/get")
+async def config_get():
+    with open("config.yaml", "r") as yamlfile:
+        configData = yaml.load(yamlfile, Loader=yaml.FullLoader)
+        yamlfile.close()
+    return JSONResponse(configData)
