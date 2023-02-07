@@ -1,10 +1,9 @@
-FROM ubuntu:20.04
-WORKDIR /base
+# Dockerfile
+FROM python:3.11.1-slim
 
-RUN apt-get update && apt-get upgrade -y && apt-get install -y python3 python3-pip 
+WORKDIR /app
 
-RUN pip3 install uvicorn fastapi pyyaml
-# ENV XDG_RUNTIME_DIR=/base
-# RUN chmod -R 777 /base
-# ENV RUNLEVEL=3
-CMD sh start_service.sh
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+COPY . .

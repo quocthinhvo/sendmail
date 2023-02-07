@@ -1,12 +1,10 @@
-version: "3.9"
+version: '3.8'
+
 services:
-  service:
-    build:
-      context: ./
-      dockerfile: dockerfile
-    container_name: sendmail_service
-    ports:
-      - 8000:80
-    restart: unless-stopped
+  web:
+    build: .
+    command: uvicorn main:app --host 0.0.0.0
     volumes:
-      - ./:/base
+      - .:/app
+    ports:
+      - 8008:8000
