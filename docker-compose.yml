@@ -10,6 +10,3 @@ services:
     restart: unless-stopped
     volumes:
       - ./:/base
-    env_file:
-      - ./.env
-
