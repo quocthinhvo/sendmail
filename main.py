@@ -48,7 +48,6 @@ async def send_mail(email: EmailSchema):
             USE_CREDENTIALS = configData["USE_CREDENTIALS"],
             VALIDATE_CERTS = configData["VALIDATE_CERTS"]
         )
-
         message = MessageSchema(
             subject=email.dict().get("subject"),
             recipients=email.dict().get("email"), 
@@ -58,7 +57,8 @@ async def send_mail(email: EmailSchema):
         fm = FastMail(conf)
         await fm.send_message(message)
         return JSONResponse(status_code=200, content={"status": "Send complete"})
-    except:
+    except Exception as e:
+        print(e)
         return JSONResponse(status_code=500, content={"status": "An exception occurred"})
 
 
@@ -89,4 +89,5 @@ async def config_get():
     with open("config.yaml", "r") as yamlfile:
         configData = yaml.load(yamlfile, Loader=yaml.FullLoader)
         yamlfile.close()
+        configData["MAIL_PASSWORD"] = ""
     return JSONResponse(configData)
