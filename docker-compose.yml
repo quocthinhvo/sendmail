@@ -6,5 +6,6 @@ services:
     command: uvicorn main:app --host 0.0.0.0
     volumes:
       - .:/app
+      - /etc/tsr_api:/etc/tsr_api
     ports:
       - 8008:8000
