@@ -5,9 +5,21 @@ from starlette.responses import JSONResponse
 from pydantic import EmailStr, BaseModel
 from typing import List
 import yaml
+from fastapi.middleware.cors import CORSMiddleware
 import json
-
 app = FastAPI()
+
+origins = [
+    "*"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 class EmailSchema(BaseModel):
