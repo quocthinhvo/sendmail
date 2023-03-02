@@ -50,7 +50,7 @@ async def root():
 async def send_json():
     try:
         with open('/etc/tsr_api/test.json', mode="r") as jsonfile:
-            response = jsonfile.readlines()
+            response = jsonfile.read()
             return response
     except:
         return JSONResponse(status_code=500, content={"status": "An error has been encountered"})
