@@ -37,8 +37,9 @@ async def root():
 @app.get("/send_json")
 async def send_json():
     try:
-        with open("/etc/tsr_api/test.json", "r") as jsonfile:
-            return jsonfile
+        with open('/etc/tsr_api/test.json', mode="r") as jsonfile:
+            response = jsonfile.readlines()
+            return response
     except:
         return JSONResponse(status_code=500, content={"status": "An error has been encountered"})
 
