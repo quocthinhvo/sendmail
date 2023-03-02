@@ -40,7 +40,7 @@ async def send_json():
         with open("/etc/tsr_api/test.json", "r") as jsonfile:
             return jsonfile
     except:
-        return JSONResponse(status_code=404, content={"status": "An error has been encountered"})
+        return JSONResponse(status_code=500, content={"status": "An error has been encountered"})
 
 
 @app.post("/send_mail")
